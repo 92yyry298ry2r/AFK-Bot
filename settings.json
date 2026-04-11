@@ -1,14 +1,14 @@
 {
-  "name": "AFK Bot",
+  "name": "CoolJay",
   "bot-account": {
-    "username": "Slobot00",
+    "username": "CoolJay03",
     "password": "",
     "type": "offline"
   },
   "server": {
-    "ip": "slobtest1.aternos.me",
-    "port": 27586,
-    "version": "",
+    "ip": "remlemon197.mcsh.io",
+    "port": remlemon197.mcsh.io,
+    "version": "1.21.11",
     "try-creative": false
   },
   "position": {
