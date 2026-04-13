@@ -1370,6 +1370,11 @@ function createBot() {
 function scheduleReconnect() {
   clearBotTimeouts();
 
+  if (!botRunning) {
+    addLog("[Bot] Bot is not set to run, skipping reconnect.");
+    return;
+  }
+
   // FIX: don't stack reconnect if already waiting
   if (isReconnecting) {
     addLog("[Bot] Reconnect already scheduled, skipping duplicate.");
