@@ -1257,6 +1257,66 @@ function createBot() {
       addLog(
         `[Bot] [+] Successfully spawned on server! (Version: ${bot.version})`,
       );
+
+      // HUB DETECTION: Check if connected to wrong server (hub)
+      if (config.server.mainServerCheck && config.server.mainServerCheck.enabled && bot) {
+        addLog(`[Hub] Checking if connected to main server...`);
+
+        const checkCommand = config.server.mainServerCheck.command;
+        const mainServerPattern = config.server.mainServerCheck.mainServerPattern;
+
+        let mainServerConfirmed = false;
+        let checkAttempts = 0;
+        const maxAttempts = 5;
+
+        const checkHandler = (message) => {
+          const msgLower = message.toLowerCase();
+          const patternLower = mainServerPattern.toLowerCase();
+
+          if (msgLower.includes(patternLower)) {
+            mainServerConfirmed = true;
+            addLog(`[Hub] Main server confirmed! Pattern "${mainServerPattern}" found.`);
+          }
+        };
+
+        bot.on("messagestr", checkHandler);
+
+        const doCheck = () => {
+          if (!bot || !botState.connected) return;
+
+          checkAttempts++;
+          addLog(`[Hub] Check attempt ${checkAttempts}/${maxAttempts}...`);
+          bot.chat(checkCommand);
+
+          setTimeout(() => {
+            if (mainServerConfirmed) {
+              bot.removeListener("messagestr", checkHandler);
+              addLog(`[Hub] Confirmed connected to MAIN server.`);
+              finishSpawnInitialization();
+            } else if (checkAttempts < maxAttempts) {
+              // Retry
+              doCheck();
+            } else {
+              bot.removeListener("messagestr", checkHandler);
+              addLog(`[Hub] Main server pattern not detected after ${maxAttempts} attempts. Assuming HUB - disconnecting...`);
+              bot.end("Not on main server - reconnecting to main server");
+            }
+          }, 2000);
+        };
+
+        // Start first check
+        doCheck();
+
+      } else {
+        finishSpawnInitialization();
+      }
+    });
+
+    function finishSpawnInitialization() {
+      if (!bot || !botState.connected) return;
+
+      addLog(`[Bot] [+] Successfully spawned on MAIN server! (Version: ${bot.version})`);
+
       if (
         config.discord &&
         config.discord.events &&
@@ -1294,7 +1354,7 @@ function createBot() {
           addLog("[INFO] Bot is now in Creative Mode.");
         }
       });
-    });
+    }
 
     // FIX: 'kicked' fires before 'end'. Remove the scheduleReconnect from 'kicked'
     // so that 'end' is the single source of reconnect truth, preventing double-trigger.

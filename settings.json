@@ -9,7 +9,12 @@
     "ip": "remlemon197.mcsh.io",
     "port": 25565,
     "version": "1.21.11",
-    "try-creative": false
+    "try-creative": false,
+    "mainServerCheck": {
+      "enabled": true,
+      "command": "/about",
+      "mainServerPattern": "This server is running Paper version 1.21.11-130-ver/1.21.11@c5a2736 (2026-04-11T11:14:19Z) (Implementing API version 1.21.11-R0.1-SNAPSHOT)"
+    }
   },
   "position": {
     "enabled": true,
